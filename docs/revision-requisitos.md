@@ -60,7 +60,7 @@ Los documentos originales permanecen fuera del repositorio del programa. La revi
 
 ## Límites locales
 
-Cambiar las cuentas de ejemplo en el código no migra bases de datos existentes. La base de desarrollo conserva sus cuentas previas; el selector ficticio funciona con una base inicializada con los datos nuevos. No se borraron ni alteraron registros de esa base durante esta revisión.
+La inicialización incorpora una migración versionada que agrega las cuatro cuentas ficticias también a bases existentes, sin borrar usuarios ni sobrescribir cuentas que ya tengan esos correos. Se ejecuta una sola vez para respetar posteriores cambios de contraseña y eliminaciones.
 
 El informe evita asignar un porcentaje: hay criterios de distinta importancia y faltan pruebas de servidor para sostener una cifra.
 
@@ -70,7 +70,7 @@ El informe evita asignar un porcentaje: hay criterios de distinta importancia y 
 - Revisión visual en vista de escritorio y móvil: catálogo, navegación y formulario. Sin desbordamiento horizontal en las pantallas móviles inspeccionadas.
 - Formulario: intentar avanzar vacío muestra los campos faltantes y conserva el paso actual.
 - Mensajes: la búsqueda por nombre reduce la lista de conversaciones.
-- Inicio probado con una cuenta de la base local existente. El selector de datos ficticios no inicia sesión contra esa base antigua; requiere una migración independiente o una base nueva.
+- Tras corregir la inicialización, se verificó el acceso de las cuatro cuentas ficticias mediante /api/session en la base local existente. La regresión scripts/test-demo-accounts.cjs comprueba bases vacías y pobladas, credenciales incorrectas, conservación de usuarios, cambios de contraseña y eliminaciones.
 - `git diff --check`: sin errores.
 - `tsc --noEmit`: detecta ocho errores previos en app/api/users/route.ts y app/api/users/[id]/route.ts porque request.json() se trata como unknown. Esos archivos no se cambiaron en esta entrega. No se declara que la comprobación completa de tipos esté aprobada.
 - La compilación de producción se ejecutó directamente con `node scripts/run-framework.mjs build`, después de que el helper no encontrara su ruta de npm.

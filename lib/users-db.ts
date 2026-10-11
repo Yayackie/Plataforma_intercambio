@@ -3,10 +3,10 @@ import { env } from "cloudflare:workers";
 import type { UserAccount, UserAccountInput } from "@/lib/marketplace-types";
 
 const demoUsers = [
-  { id: 1, name: "Alex Rivera", email: "alex.rivera@example.com", password: "DemoAlex2026!", career: "Ingeniería Mecatrónica", semester: 4, role: "Estudiante" as const },
-  { id: 2, name: "Lucía Torres", email: "lucia.torres@example.com", password: "DemoLucia2026!", career: "Ingeniería en Industrias Alimentarias", semester: 5, role: "Estudiante" as const },
-  { id: 3, name: "Mateo Vega", email: "mateo.vega@example.com", password: "DemoMateo2026!", career: "Ingeniería Automotriz", semester: 4, role: "Estudiante" as const },
-  { id: 4, name: "Sofía Luna", email: "sofia.luna@example.com", password: "DemoSofia2026!", career: null, semester: null, role: "Administrador" as const },
+  { name: "Alex Rivera", email: "alex.rivera@example.com", password: "DemoAlex2026!", career: "Ingeniería Mecatrónica", semester: 4, role: "Estudiante" as const },
+  { name: "Lucía Torres", email: "lucia.torres@example.com", password: "DemoLucia2026!", career: "Ingeniería en Industrias Alimentarias", semester: 5, role: "Estudiante" as const },
+  { name: "Mateo Vega", email: "mateo.vega@example.com", password: "DemoMateo2026!", career: "Ingeniería Automotriz", semester: 4, role: "Estudiante" as const },
+  { name: "Sofía Luna", email: "sofia.luna@example.com", password: "DemoSofia2026!", career: null, semester: null, role: "Administrador" as const },
 ];
 
 function db() {
@@ -22,11 +22,16 @@ export async function passwordHash(email: string, password: string) {
 
 async function seedUsers() {
   const database = db();
-  const row = await database.prepare("SELECT COUNT(*) AS total FROM users").first<{ total: number }>();
-  if (Number(row?.total ?? 0) > 0) return;
+  // Run each demo-data version once, including databases with older accounts.
+  // Keep existing users, edited passwords and deliberately deleted demo accounts intact.
+  await database.prepare("CREATE TABLE IF NOT EXISTS app_seed_versions (version TEXT PRIMARY KEY)").run();
+  const version = "fictional-demo-accounts-v1";
+  const applied = await database.prepare("SELECT version FROM app_seed_versions WHERE version = ?").bind(version).first();
+  if (applied) return;
   const statements = await Promise.all(demoUsers.map(async (user) => database.prepare(
-    "INSERT INTO users (id, name, email, password_hash, career, semester, role, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'Activo', ?)"
-  ).bind(user.id, user.name, user.email, await passwordHash(user.email, user.password), user.career, user.semester, user.role, new Date().toISOString())));
+    "INSERT INTO users (name, email, password_hash, career, semester, role, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'Activo', ?) ON CONFLICT(email) DO NOTHING"
+  ).bind(user.name, user.email, await passwordHash(user.email, user.password), user.career, user.semester, user.role, new Date().toISOString())));
+  statements.push(database.prepare("INSERT INTO app_seed_versions (version) VALUES (?) ON CONFLICT(version) DO NOTHING").bind(version));
   await database.batch(statements);
 }
 
