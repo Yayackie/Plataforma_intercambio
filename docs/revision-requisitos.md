@@ -92,3 +92,10 @@ No se enviaron mensajes a terceros ni correos reales, ni se modificaron registro
 - El préstamo ficticio del multímetro quedó pendiente de recepción para que el usuario pueda comprobar el último paso con prueba123.
 
 La doble confirmación registra la declaración de ambas cuentas; no constituye por sí sola evidencia física de la entrega. No se envían correos automáticos en esta versión.
+
+## Iteración: perfil de consulta e inicio simplificado (11 de octubre de 2026)
+
+- El panel de cuenta muestra nombre, correo, rol y datos académicos sin campos editables. El botón Configurar mi perfil abre una pantalla independiente con validación, estado de guardado y errores.
+- Se conservan dos roles, según aclaración del usuario: Estudiante y Administrador. Administración ya incluye creación, edición, suspensión/reactivación y eliminación de cuentas; sus endpoints verifican la sesión y el rol.
+- Inicio presenta dos tarjetas diferenciadas para Mercado y Préstamos. Se eliminan los accesos y mensajes vacíos duplicados, conservando recomendaciones separadas por modalidad cuando existen.
+- Validación: TypeScript, compilación de producción y regresión de cuentas aprobados. Revisión en navegador del inicio, perfil sin entradas editables, navegación a Configuración y guardado exitoso sin salir de la pantalla.

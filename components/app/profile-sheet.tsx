@@ -1,17 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Check, ChevronRight, GraduationCap, LogOut, Mail, UserRound } from "lucide-react";
+import { useState } from "react";
+import { ChevronRight, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { careers } from "@/lib/demo-data";
-import type { UserAccount, UserAccountInput } from "@/lib/marketplace-types";
+import type { UserAccount } from "@/lib/marketplace-types";
 
-export function ProfileSheet({ user, onSave, onSignOut }: { user: UserAccount; onSave: (changes: Partial<UserAccountInput>) => Promise<void>; onSignOut: () => void }) {
-  const [open, setOpen] = useState(false); const [name, setName] = useState(user.name); const [career, setCareer] = useState(user.career ?? careers[0]); const [semester, setSemester] = useState(`${user.semester ?? 1}`); const [saved, setSaved] = useState(false); const [busy, setBusy] = useState(false);
-  useEffect(() => { setName(user.name); setCareer(user.career ?? careers[0]); setSemester(`${user.semester ?? 1}`); }, [user]);
-  async function save() { setBusy(true); await onSave({ name, career: user.role === "Estudiante" ? career : null, semester: user.role === "Estudiante" ? Number(semester) : null }); setBusy(false); setSaved(true); setTimeout(() => setSaved(false), 1600); }
-  const detail = user.role === "Administrador" ? "Administrador institucional" : `${user.career?.replace("Ingeniería ", "")} · ${user.semester}°`;
-  return <Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><button className="profile-mini" aria-label="Abrir mi perfil"><span>{user.initials}</span><p><strong>{user.name}</strong><small>{detail}</small></p><ChevronRight /></button></SheetTrigger><SheetContent className="profile-sheet"><SheetHeader><div className="profile-hero"><span>{user.initials}</span><div><p className="eyebrow">PERFIL INSTITUCIONAL</p><SheetTitle>{user.name}</SheetTitle><SheetDescription>Administra los datos que personalizan tu experiencia.</SheetDescription></div></div></SheetHeader><div className="profile-form"><label><UserRound /> Nombre completo<Input value={name} onChange={(event) => setName(event.target.value)} /></label><label><Mail /> Correo<Input value={user.email} disabled /></label>{user.role === "Estudiante" && <><label><GraduationCap /> Carrera<Select value={career} onValueChange={setCareer}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{careers.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></label><label>Semestre<Select value={semester} onValueChange={setSemester}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Array.from({ length: 9 }, (_, index) => `${index + 1}`).map((item) => <SelectItem key={item} value={item}>{item}° semestre</SelectItem>)}</SelectContent></Select></label></>}</div><div className="profile-actions"><Button onClick={save} disabled={busy}>{saved ? <><Check /> Cambios guardados</> : busy ? "Guardando…" : "Guardar perfil"}</Button><Button variant="ghost" onClick={onSignOut}><LogOut /> Cerrar sesión</Button></div></SheetContent></Sheet>;
+export function ProfileSheet({ user, onSettings, onSignOut }: { user: UserAccount; onSettings: () => void; onSignOut: () => void }) {
+  const [open, setOpen] = useState(false);
+  return <Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><button className="profile-mini" aria-label="Abrir mi perfil"><span>{user.initials}</span><p><strong>{user.name}</strong><small>{user.role}</small></p><ChevronRight /></button></SheetTrigger><SheetContent className="profile-sheet"><SheetHeader><div className="profile-hero"><span>{user.initials}</span><div><p className="eyebrow">MI CUENTA</p><SheetTitle>{user.name}</SheetTitle><SheetDescription>Tu información institucional.</SheetDescription></div></div></SheetHeader><dl className="profile-details"><div><dt>Correo</dt><dd>{user.email}</dd></div><div><dt>Rol</dt><dd>{user.role}</dd></div>{user.role === "Estudiante" && <><div><dt>Carrera</dt><dd>{user.career ?? "Sin especificar"}</dd></div><div><dt>Semestre</dt><dd>{user.semester ? `${user.semester}° semestre` : "Sin especificar"}</dd></div></>}</dl><div className="profile-actions"><Button onClick={() => { setOpen(false); onSettings(); }}><Settings /> Configurar mi perfil</Button><Button variant="ghost" onClick={onSignOut}><LogOut /> Cerrar sesión</Button></div></SheetContent></Sheet>;
 }

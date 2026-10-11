@@ -1,4 +1,4 @@
-export type View = "inicio" | "mercado" | "publicaciones" | "mensajes" | "prestamos" | "admin";
+export type View = "inicio" | "mercado" | "publicaciones" | "mensajes" | "prestamos" | "admin" | "configuracion";
 export type Mode = "Venta" | "Préstamo" | "Donación";
 export type Status = "Disponible" | "En negociación" | "Prestado" | "Cerrado";
 export type Category = "Equipos / Instrumentación" | "Insumos / Consumibles" | "Seguridad / Higiene" | "Material didáctico";

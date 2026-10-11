@@ -57,7 +57,7 @@ export function useMarketplace(currentUser: UserAccount | null) {
     const timer = window.setInterval(refresh, 15000);
     window.addEventListener("focus", refresh);
     return () => { active = false; window.clearInterval(timer); window.removeEventListener("focus", refresh); };
-  }, [currentUser]);
+  }, [currentUser?.id, currentUser?.role]);
 
   useEffect(() => {
     if (localReady) localStorage.setItem(KEY, JSON.stringify({ listings: storedListings, reports, conversations }));

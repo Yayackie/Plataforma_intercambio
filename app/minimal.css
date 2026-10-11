@@ -159,3 +159,28 @@ body, .app-shell { background: var(--background); color: var(--foreground); }
   .loan-top > div { min-width: 0; overflow-wrap: anywhere; }
   .loan-top .due { margin-left: 0; }
 }
+
+.profile-details { display: grid; gap: 22px; padding: 24px 0; }
+.profile-sheet .profile-details { padding: 24px; }
+.profile-details dt { color: #5c6d67; font-size: .85rem; margin-bottom: 6px; }
+.profile-details dd { margin: 0; overflow-wrap: anywhere; font-weight: 600; }
+.settings-card { max-width: 680px; padding: 28px; background: white; border: 1px solid #dce4e1; border-radius: 14px; }
+.settings-card fieldset { display: grid; gap: 10px; border: 0; padding: 0; }
+.settings-card label { margin-top: 14px; font-weight: 600; }
+.settings-card select { padding: 12px; width: 100%; border: 1px solid #dce4e1; border-radius: 8px; background: white; color: #20332f; }
+.settings-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.settings-card [role=alert] { color: #b42318; margin-top: 16px; }
+.destination-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; margin-bottom: 36px; }
+.destination-card { text-align: left; padding: 28px; border: 1px solid #c9ded8; border-radius: 16px; background: #e5f1ed; color: #174b42; transition: background .15s; }
+.destination-card.lending { background: #f1f2e9; border-color: #dfe2d4; color: #414d2e; }
+.destination-card:hover { background: #d7eae4; }
+.destination-card.lending:hover { background: #e7eadb; }
+.destination-card:focus-visible { outline: 3px solid #00776f; outline-offset: 4px; }
+.destination-card > svg { width: 30px; height: 30px; margin-bottom: 24px; }
+.destination-card h2 { font-size: 1.5rem; margin-bottom: 10px; }
+.destination-card p { line-height: 1.6; max-width: 360px; }
+.destination-card span { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 26px; font-weight: 600; }
+.home-note { border-top: 1px solid #dce4e1; padding-top: 24px; }
+.home-note h2 { font-size: 1.1rem; margin-bottom: 8px; }
+.home-note p { max-width: 650px; color: #5c6d67; line-height: 1.6; }
+@media(max-width:640px) { .destination-grid { grid-template-columns: 1fr; gap: 14px; } .destination-card,.settings-card { padding: 22px; } }
