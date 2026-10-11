@@ -35,10 +35,10 @@ function setup() {
   return { database, api: module.exports };
 }
 const accounts = [
-  ['alex.rivera@example.com', 'DemoAlex2026!', 'Estudiante'],
-  ['lucia.torres@example.com', 'DemoLucia2026!', 'Estudiante'],
-  ['mateo.vega@example.com', 'DemoMateo2026!', 'Estudiante'],
-  ['sofia.luna@example.com', 'DemoSofia2026!', 'Administrador'],
+  ['prueba123@itesa.edu.mx', 'Prueba123!', 'Estudiante'],
+  ['prueba456@itesa.edu.mx', 'Prueba456!', 'Estudiante'],
+  ['prueba789@itesa.edu.mx', 'Prueba789!', 'Estudiante'],
+  ['admin123@itesa.edu.mx', 'Admin123!', 'Administrador'],
 ];
 (async () => {
   for (const populated of [false, true]) {

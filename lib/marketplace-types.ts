@@ -1,8 +1,8 @@
-export type View = "inicio" | "catalogo" | "publicaciones" | "mensajes" | "prestamos" | "admin";
+export type View = "inicio" | "mercado" | "publicaciones" | "mensajes" | "prestamos" | "admin";
 export type Mode = "Venta" | "Préstamo" | "Donación";
 export type Status = "Disponible" | "En negociación" | "Prestado" | "Cerrado";
 export type Category = "Equipos / Instrumentación" | "Insumos / Consumibles" | "Seguridad / Higiene" | "Material didáctico";
-export interface Listing { id: number; title: string; description: string; category: Category; mode: Mode; status: Status; condition: string; career: string; semester: number; owner: string; price?: number; returnDays?: number; accent: string; icon: "tool" | "book" | "shield" | "flask" | "calc" | "box"; mine?: boolean; hidden?: boolean; }
+export interface Listing { id: number; title: string; description: string; category: Category; mode: Mode; status: Status; condition: string; career: string; semester: number; owner: string; ownerId?: number; price?: number; returnDays?: number; accent: string; icon: "tool" | "book" | "shield" | "flask" | "calc" | "box"; mine?: boolean; hidden?: boolean; }
 export interface Conversation { id: number; person: string; listing: string; avatar: string; online: boolean; messages: { from: "me" | "them"; text: string; time: string }[]; }
 export interface Loan { id: number; listingId: number; item: string; counterpart: string; due: string; borrowerConfirmed: boolean; ownerConfirmed: boolean; role: "borrower" | "owner"; }
 export interface Report { id: number; target: string; type: "Publicación" | "Usuario"; reason: string; reporter: string; resolved: boolean; }

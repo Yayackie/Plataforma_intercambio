@@ -3,13 +3,13 @@ import { env } from "cloudflare:workers";
 import type { UserAccount, UserAccountInput } from "@/lib/marketplace-types";
 
 const demoUsers = [
-  { name: "Alex Rivera", email: "alex.rivera@example.com", password: "DemoAlex2026!", career: "Ingeniería Mecatrónica", semester: 4, role: "Estudiante" as const },
-  { name: "Lucía Torres", email: "lucia.torres@example.com", password: "DemoLucia2026!", career: "Ingeniería en Industrias Alimentarias", semester: 5, role: "Estudiante" as const },
-  { name: "Mateo Vega", email: "mateo.vega@example.com", password: "DemoMateo2026!", career: "Ingeniería Automotriz", semester: 4, role: "Estudiante" as const },
-  { name: "Sofía Luna", email: "sofia.luna@example.com", password: "DemoSofia2026!", career: null, semester: null, role: "Administrador" as const },
+  { name: "Prueba 123", email: "prueba123@itesa.edu.mx", password: "Prueba123!", career: "Ingeniería Mecatrónica", semester: 4, role: "Estudiante" as const },
+  { name: "Prueba 456", email: "prueba456@itesa.edu.mx", password: "Prueba456!", career: "Ingeniería en Industrias Alimentarias", semester: 5, role: "Estudiante" as const },
+  { name: "Prueba 789", email: "prueba789@itesa.edu.mx", password: "Prueba789!", career: "Ingeniería Automotriz", semester: 4, role: "Estudiante" as const },
+  { name: "Administración Prueba", email: "admin123@itesa.edu.mx", password: "Admin123!", career: null, semester: null, role: "Administrador" as const },
 ];
 
-function db() {
+export function db() {
   if (!env.DB) throw new Error("La base de datos de usuarios no está disponible.");
   return env.DB;
 }
@@ -25,7 +25,7 @@ async function seedUsers() {
   // Run each demo-data version once, including databases with older accounts.
   // Keep existing users, edited passwords and deliberately deleted demo accounts intact.
   await database.prepare("CREATE TABLE IF NOT EXISTS app_seed_versions (version TEXT PRIMARY KEY)").run();
-  const version = "fictional-demo-accounts-v1";
+  const version = "institutional-demo-accounts-v2";
   const applied = await database.prepare("SELECT version FROM app_seed_versions WHERE version = ?").bind(version).first();
   if (applied) return;
   const statements = await Promise.all(demoUsers.map(async (user) => database.prepare(
@@ -35,7 +35,7 @@ async function seedUsers() {
   await database.batch(statements);
 }
 
-function present(row: Record<string, unknown>): UserAccount {
+export function present(row: Record<string, unknown>): UserAccount {
   const name = String(row.name);
   return {
     id: Number(row.id), name, email: String(row.email),
@@ -55,6 +55,7 @@ export async function listUsers() {
 export async function login(email: string, password: string) {
   await seedUsers();
   const normalized = email.trim().toLowerCase();
+  if (!normalized.endsWith("@itesa.edu.mx")) return null;
   const row = await db().prepare("SELECT id, name, email, career, semester, role, status, password_hash FROM users WHERE email = ?").bind(normalized).first<Record<string, unknown>>();
   if (!row || row.password_hash !== await passwordHash(normalized, password)) return null;
   if (row.status !== "Activo") throw new Error("Esta cuenta está suspendida. Contacta a un administrador.");

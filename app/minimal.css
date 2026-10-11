@@ -145,3 +145,17 @@ body, .app-shell { background: var(--background); color: var(--foreground); }
   .sidebar { visibility: hidden; }
   .sidebar.sidebar-open { visibility: visible; }
 }
+.loan-navigation, .home-destinations { display: flex; gap: 10px; flex-wrap: wrap; }
+.loan-navigation { margin-bottom: 26px; }
+.loan-navigation button { white-space: normal; height: auto; min-height: 40px; }
+.recommendation-section { margin: 26px 0; }
+.recommendation-section > h3 { font-size: 1rem; font-weight: 600; margin-bottom: 14px; }
+.recommendation-section > p { color: #5c6d67; font-size: .9rem; }
+.recommendation-section > button { margin-top: 12px; }
+.return-pending { margin: 12px 0; color: #765415; background: #fff7e8; padding: 10px; border-radius: 6px; font-size: .85rem; }
+.loan-card > button { white-space: normal; height: auto; min-height: 42px; }
+@media (max-width: 640px) {
+  .loan-top { flex-wrap: wrap; }
+  .loan-top > div { min-width: 0; overflow-wrap: anywhere; }
+  .loan-top .due { margin-left: 0; }
+}

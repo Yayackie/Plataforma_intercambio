@@ -1,4 +1,4 @@
-import type { Conversation, Listing, Loan, Report, UserAccount } from "./marketplace-types";
+import type { Conversation, Listing, Report, UserAccount } from "./marketplace-types";
 export const careers = ["Ingeniería en Industrias Alimentarias", "Ingeniería Mecatrónica", "Ingeniería Automotriz"];
 export const categories = ["Equipos / Instrumentación", "Insumos / Consumibles", "Seguridad / Higiene", "Material didáctico"] as const;
 export const initialListings: Listing[] = [
@@ -13,11 +13,10 @@ export const initialConversations: Conversation[] = [
   { id: 1, person: "Diego Martínez", listing: "Multímetro digital", avatar: "DM", online: true, messages: [{ from: "them", text: "¡Hola! Sí está disponible. ¿Lo necesitas para esta semana?", time: "10:14" }, { from: "me", text: "Sí, para la práctica del jueves. Puedo entregarlo el lunes.", time: "10:16" }, { from: "them", text: "Perfecto. Nos vemos junto al laboratorio de Mecatrónica.", time: "10:18" }] },
   { id: 2, person: "Renata García", listing: "Cálculo vectorial", avatar: "RG", online: false, messages: [{ from: "them", text: "El libro sigue disponible 🙂", time: "Ayer" }] },
 ];
-export const initialLoans: Loan[] = [{ id: 1, listingId: 5, item: "Vidriería básica", counterpart: "Sofía H.", due: "24 sep", borrowerConfirmed: true, ownerConfirmed: false, role: "owner" }, { id: 2, listingId: 1, item: "Multímetro digital", counterpart: "Diego M.", due: "29 sep", borrowerConfirmed: false, ownerConfirmed: false, role: "borrower" }];
 export const initialReports: Report[] = [{ id: 1, target: "Kit de herramientas industrial", type: "Publicación", reason: "La descripción no coincide con el artículo entregado.", reporter: "Mariana P.", resolved: false }, { id: 2, target: "Usuario: Carlos N.", type: "Usuario", reason: "No se presentó en dos entregas acordadas.", reporter: "Luis A.", resolved: false }, { id: 3, target: "Calculadora científica", type: "Publicación", reason: "Precio potencialmente engañoso.", reporter: "Ana V.", resolved: true }];
 export const initialUsers: UserAccount[] = [
-  { id: 1, name: "Alex Rivera", email: "alex.rivera@example.com", career: "Ingeniería Mecatrónica", semester: 4, role: "Estudiante", status: "Activo", initials: "AR" },
-  { id: 2, name: "Lucía Torres", email: "lucia.torres@example.com", career: "Ingeniería en Industrias Alimentarias", semester: 5, role: "Estudiante", status: "Activo", initials: "LT" },
-  { id: 3, name: "Mateo Vega", email: "mateo.vega@example.com", career: "Ingeniería Automotriz", semester: 4, role: "Estudiante", status: "Activo", initials: "MV" },
-  { id: 4, name: "Sofía Luna", email: "sofia.luna@example.com", career: null, semester: null, role: "Administrador", status: "Activo", initials: "SL" },
+  { id: 1, name: "Prueba 123", email: "prueba123@itesa.edu.mx", career: "Ingeniería Mecatrónica", semester: 4, role: "Estudiante", status: "Activo", initials: "P1" },
+  { id: 2, name: "Prueba 456", email: "prueba456@itesa.edu.mx", career: "Ingeniería en Industrias Alimentarias", semester: 5, role: "Estudiante", status: "Activo", initials: "P4" },
+  { id: 3, name: "Prueba 789", email: "prueba789@itesa.edu.mx", career: "Ingeniería Automotriz", semester: 4, role: "Estudiante", status: "Activo", initials: "P7" },
+  { id: 4, name: "Administración Prueba", email: "admin123@itesa.edu.mx", career: null, semester: null, role: "Administrador", status: "Activo", initials: "AP" },
 ];

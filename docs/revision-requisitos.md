@@ -14,27 +14,27 @@ Referencias locales revisadas:
 
 Los documentos originales permanecen fuera del repositorio del programa. La revisión no modifica ni sustituye su aprobación académica.
 
-## Matriz de cumplimiento después de esta primera simplificación
+## Matriz de cumplimiento actualizada
 
 | Requisito | Estado | Evidencia y pendiente |
 | --- | --- | --- |
-| RF-01 Acceso institucional | Parcial | El acceso consulta usuarios en D1, pero devuelve un usuario sin establecer una sesión de servidor. El dominio se revisa en ciertas pantallas; las cuentas ficticias son una excepción explícita de demostración. Falta verificación de correo y autorización real de las API. |
-| RF-02 Perfiles | Parcial | Existe edición de carrera y semestre. El guardado usa ahora el ID del usuario actual, pero la API sigue confiando en un actorId enviado por el cliente. |
+| RF-01 Acceso institucional | Parcial | Acceso manual con dominio ITESA obligatorio en cliente y servidor. Sesión HttpOnly persistida con vencimiento y cierre de sesión. Falta verificar la propiedad del correo institucional. |
+| RF-02 Perfiles | Implementado en prototipo | Edición de perfil con identidad obtenida de sesión. Estudiantes solo editan su cuenta y no pueden elevar rol, cambiar correo ni estado; administración requiere rol verificado en servidor. |
 | RF-03 Publicaciones | Parcial | Existe formulario y alta local. Falta materia; la fotografía solo conserva su nombre durante el formulario y no se almacena ni se muestra. Las condiciones actuales no coinciden con Nuevo / Usado excelente / Usado aceptable. |
 | RF-04 Modalidades | Implementado en prototipo | Venta, préstamo y donación con precio o plazo requerido. Pendiente validar y guardar las operaciones en servidor. |
 | RF-05 Filtros | Parcial | Carrera, semestre y categoría combinables. Se corrigió la ocultación de filtros en móvil. Faltan materia y condición; limpiar filtros solo aparece cuando no hay resultados. |
 | RF-06 Sugerencias | Implementado en prototipo | Inicio conserva recomendaciones y ahora cruza carrera y semestre, excluyendo artículos propios, ocultos y no disponibles. Usa datos locales. |
-| RF-07 Mensajería | Simulación local | Los mensajes se guardan en el navegador, sin entrega a otro usuario. La búsqueda de conversaciones ya filtra. Solicitar un recurso sin conversación asociada todavía abre la primera conversación: debe implementarse la creación por publicación y participantes. |
-| RF-08 Estados | Parcial | El selector cambia estados locales. No existe propiedad de publicaciones por cuenta en servidor; además permite cambiar manualmente Prestado a Disponible sin doble confirmación. |
-| RF-09 Devolución | Parcial | Hay lógica de dos confirmaciones en datos locales. Faltan transacciones persistentes, participantes autenticados y prueba desde dos cuentas/dispositivos. |
+| RF-07 Mensajería | Simulación local | Mensajes en el navegador sin entrega entre usuarios. Sin conversación asociada ya no se abre una conversación ajena; falta crear conversaciones por publicación y participantes. |
+| RF-08 Estados | Parcial | Mercado sigue con estados locales. Los recursos vinculados a préstamos toman su estado de D1 y no pueden liberarse manualmente desde Mis publicaciones. |
+| RF-09 Devolución | Implementado para préstamos registrados | D1 guarda participantes y confirmaciones. El prestatario informa devolución y solo después el dueño confirma recepción. El servidor autentica la cuenta y rechaza a terceros. Falta el alta de nuevas solicitudes y aceptación del préstamo desde catálogo. |
 | RF-10 Correos | No implementado | No hay servicio ni programación de recordatorios y confirmaciones. Se retiró el texto de interfaz que prometía enviarlos. |
 | RF-11 Moderación | Parcial | Reportes locales con motivo fijo. Ocultar funciona localmente; resolver una incidencia de usuario no suspende la cuenta. La suspensión del directorio es una operación diferente. Faltan motivo editable, relación por ID y permisos de servidor. |
 | RF-12 Búsqueda | Implementado en prototipo | Busca nombre/descripción y respeta filtros; estado vacío y limpieza comprobados en navegador. |
 | RF-13 Reseñas | No implementado / especificación incompleta | Aparece en el listado y HU-14 de r1.1, pero no tiene ficha detallada ni criterios de aceptación. Debe precisarse antes de implementarlo. |
-| RNF-01 Seguridad | No cumple para producción | Usa SHA-256 determinista para contraseñas, credenciales demo en código y actorId controlado por cliente. GET /api/users no exige sesión. Se necesita hash de contraseñas adecuado, sesiones y autorización del servidor. |
+| RNF-01 Seguridad | Parcial; no certificado para producción | Sesiones HttpOnly/SameSite con expiración, tokens aleatorios guardados como hash, validación de origen y autorización de usuarios/préstamos en servidor. Sigue pendiente reemplazar SHA-256 de contraseñas, limitar intentos y separar las cuentas demo de un despliegue real. |
 | RNF-02 Usabilidad | Parcial | Se conserva publicación en tres pasos. Interfaz simplificada y filtros móviles visibles. Faltan los campos de RF-03 y comprobación completa de todos los recorridos con usuarios. |
 | RNF-03 Rendimiento | No verificado | No hay mediciones p95 ni pruebas de concurrencia. La rapidez con seis ejemplos locales no demuestra el requisito. |
-| RNF-04 Disponibilidad | No cumple arquitectura prevista / no verificado | Publicaciones, conversaciones, reportes y préstamos dependen de localStorage; no existe persistencia compartida ni evidencia de recuperación o disponibilidad del servicio. |
+| RNF-04 Disponibilidad | Parcial / no verificado | Préstamos y sesiones ya persisten en D1. Publicaciones, conversaciones y reportes aún usan localStorage. Sin evidencia de recuperación, copias de seguridad o disponibilidad del servicio. |
 | RNF-05 Compatibilidad | Parcialmente verificado | Revisión visual en navegador integrado con tamaños de escritorio y móvil. Pendiente ejecutar la matriz Chrome / Edge / Firefox en dispositivos reales. |
 | RNF-06 Escalabilidad | Parcial | Administración agrega carreras/categorías solo en estado del componente. Se pierden al salir y no alimentan formularios ni filtros. Falta catálogo persistente y compartido. |
 
@@ -52,10 +52,10 @@ Los documentos originales permanecen fuera del repositorio del programa. La revi
 
 ## Prioridades siguientes
 
-1. Sesión autenticada y permisos por rol/propietario en servidor; hashing de contraseñas y separación de demostración/producción.
-2. Persistencia de publicaciones, fotografías, catálogos académicos, conversaciones, préstamos y reportes.
+1. Hashing de contraseñas, limitación de intentos y separación de demostración/producción; las sesiones y permisos de usuarios/préstamos ya existen.
+2. Persistencia de publicaciones, fotografías, catálogos académicos, conversaciones y reportes; alta de nuevas solicitudes de préstamo.
 3. Completar publicación y filtros con materia y condición según r1.1.
-4. Flujo de solicitud, participantes, devolución doble y correos automáticos.
+4. Completar solicitud y aceptación de préstamos, y correos automáticos. La devolución doble para préstamos registrados ya está implementada.
 5. Moderación efectiva, definición de reseñas y pruebas funcionales, de seguridad, carga y compatibilidad.
 
 ## Límites locales
@@ -72,7 +72,23 @@ El informe evita asignar un porcentaje: hay criterios de distinta importancia y 
 - Mensajes: la búsqueda por nombre reduce la lista de conversaciones.
 - Tras corregir la inicialización, se verificó el acceso de las cuatro cuentas ficticias mediante /api/session en la base local existente. La regresión scripts/test-demo-accounts.cjs comprueba bases vacías y pobladas, credenciales incorrectas, conservación de usuarios, cambios de contraseña y eliminaciones.
 - `git diff --check`: sin errores.
-- `tsc --noEmit`: detecta ocho errores previos en app/api/users/route.ts y app/api/users/[id]/route.ts porque request.json() se trata como unknown. Esos archivos no se cambiaron en esta entrega. No se declara que la comprobación completa de tipos esté aprobada.
+- `tsc --noEmit --incremental false`: aprobado después de actualizar las API de usuarios y sesiones. Los ocho errores previos de tipos quedaron corregidos.
 - La compilación de producción se ejecutó directamente con `node scripts/run-framework.mjs build`, después de que el helper no encontrara su ruta de npm.
 
 No se enviaron mensajes a terceros ni correos reales, ni se modificaron registros de usuarios para estas pruebas. No se realizó un despliegue del sitio alojado: esta entrega se guarda en código local y GitHub.
+
+## Iteración: acceso institucional, Mercado y Préstamos
+
+- Petición: quitar el selector de credenciales, usar cuentas ITESA, separar ventas de préstamos y exigir recepción confirmada por el dueño.
+- Acceso sin cuentas visibles ni datos precargados. Nuevas cuentas ficticias documentadas en `docs/cuentas-prueba.md`.
+- Mercado contiene ventas y donaciones. Préstamos contiene su catálogo y la pestaña de seguimiento; Inicio también separa las recomendaciones.
+- Confirmación previa en diálogo; el prestatario no libera el artículo. La segunda confirmación pertenece exclusivamente al dueño autenticado.
+- Se retiraron los préstamos preconfirmados de los datos del navegador; los registros actuales están en D1 y se inicializan sin confirmaciones.
+- API `/api/loans`: GET devuelve préstamos de la cuenta y estados del catálogo; PATCH recibe solo el ID y usa la sesión para decidir qué participante confirma.
+- Nuevas tablas creadas de manera idempotente: `user_sessions` y `loans`. La inicialización versionada `institutional-loans-v1` incorpora dos préstamos ficticios entre las nuevas cuentas.
+- Regresión `node scripts/test-loan-returns.cjs`: orden de confirmaciones, terceros, persistencia, repetición, visibilidad por cuenta, sesiones, cierre, origen y usuarios suspendidos.
+- API local: sin sesión 401, dueño antes de devolución 409, tercero 403; un actorId/rol enviado por cliente no cambia la identidad.
+- Navegador: Mercado excluye préstamos; Préstamos excluye ventas/donaciones; acceso manual, cierre de sesión, aviso de devolución al 50% y botón de recepción en la cuenta del dueño comprobados.
+- El préstamo ficticio del multímetro quedó pendiente de recepción para que el usuario pueda comprobar el último paso con prueba123.
+
+La doble confirmación registra la declaración de ambas cuentas; no constituye por sí sola evidencia física de la entrega. No se envían correos automáticos en esta versión.
