@@ -59,7 +59,7 @@ export function DonationsView({ userId, onSearch, onContact }: { userId: number;
     <div className="loan-navigation" aria-label="Secciones de donaciones"><Button variant={tab === "explore" ? "default" : "outline"} onClick={() => setTab("explore")}>Explorar</Button><Button variant={tab === "sent" ? "default" : "outline"} onClick={() => setTab("sent")}>Mis donaciones</Button><Button variant={tab === "received" ? "default" : "outline"} onClick={() => setTab("received")}>Solicitudes y recibidas</Button></div>
     <PublicDonations userId={userId} mode={tab === "explore" ? "explore" : tab === "sent" ? "mine" : "requests"} revision={revision} />
     {tab !== "explore" && <><h2>En proceso y propuestas privadas</h2>
-    {error && <p role="alert">{error}</p>}{loading ? <p role="status">Cargando donaciones…</p> : !visible.length ? <div className="empty-state"><p>No tienes propuestas privadas {tab === "sent" ? "enviadas" : "recibidas"}.</p></div> : null}
+    {error && <p role="alert">{error}</p>}{loading ? <p role="status">Cargando donaciones…</p> : !error && !visible.length ? <div className="empty-state"><p>No tienes propuestas privadas {tab === "sent" ? "enviadas" : "recibidas"}.</p></div> : null}
     <div className="loan-grid">{visible.map(d => {
       const donor = d.donorId === userId;
       const actions: {action: DonationAction; label: string}[] = donor
