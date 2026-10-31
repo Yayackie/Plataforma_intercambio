@@ -24,19 +24,19 @@ Los documentos originales permanecen fuera del repositorio del programa. La revi
 | RF-04 Modalidades | Implementado en prototipo | Venta, préstamo y donación con precio o plazo requerido. Pendiente validar y guardar las operaciones en servidor. |
 | RF-05 Filtros | Parcial | Carrera, semestre y categoría combinables. Se corrigió la ocultación de filtros en móvil. Faltan materia y condición; limpiar filtros solo aparece cuando no hay resultados. |
 | RF-06 Sugerencias | Implementado en prototipo | Inicio conserva recomendaciones y ahora cruza carrera y semestre, excluyendo artículos propios, ocultos y no disponibles. Usa datos locales. |
-| RF-07 Mensajería | Simulación local | Mensajes en el navegador sin entrega entre usuarios. Sin conversación asociada ya no se abre una conversación ajena; falta crear conversaciones por publicación y participantes. |
+| RF-07 Mensajería | Implementado entre cuentas | Conversaciones privadas y mensajes persistidos en D1, con identidad y participantes verificados en servidor. Búsqueda por nombre/correo parcial; un hilo por pareja de cuentas. Publicaciones con ownerId abren el chat del propietario; las antiguas sin propietario registrado abren búsqueda manual. Falta una asociación persistente entre conversación y publicación. |
 | RF-08 Estados | Parcial | Mercado sigue con estados locales. Los recursos vinculados a préstamos toman su estado de D1 y no pueden liberarse manualmente desde Mis publicaciones. |
 | RF-09 Devolución | Implementado para préstamos registrados | D1 guarda participantes y confirmaciones. El prestatario informa devolución y solo después el dueño confirma recepción. El servidor autentica la cuenta y rechaza a terceros. Falta el alta de nuevas solicitudes y aceptación del préstamo desde catálogo. |
 | RF-10 Correos | No implementado | No hay servicio ni programación de recordatorios y confirmaciones. Se retiró el texto de interfaz que prometía enviarlos. |
 | RF-11 Moderación | Parcial | Reportes locales con motivo fijo. Ocultar funciona localmente; resolver una incidencia de usuario no suspende la cuenta. La suspensión del directorio es una operación diferente. Faltan motivo editable, relación por ID y permisos de servidor. |
 | RF-12 Búsqueda | Implementado en prototipo | Busca nombre/descripción y respeta filtros; estado vacío y limpieza comprobados en navegador. |
 | RF-13 Reseñas | No implementado / especificación incompleta | Aparece en el listado y HU-14 de r1.1, pero no tiene ficha detallada ni criterios de aceptación. Debe precisarse antes de implementarlo. |
-| RNF-01 Seguridad | Parcial; no certificado para producción | Sesiones HttpOnly/SameSite con expiración, tokens aleatorios guardados como hash, validación de origen y autorización de usuarios/préstamos en servidor. Sigue pendiente reemplazar SHA-256 de contraseñas, limitar intentos y separar las cuentas demo de un despliegue real. |
+| RNF-01 Seguridad | Parcial; no certificado para producción | Sesiones HttpOnly/SameSite con expiración, tokens aleatorios guardados como hash, validación de origen y autorización de usuarios/préstamos en servidor. Sigue pendiente reemplazar SHA-256 de contraseñas, limitar intentos de inicio de sesión y separar las cuentas demo de un despliegue real. |
 | RNF-02 Usabilidad | Parcial | Se conserva publicación en tres pasos. Interfaz simplificada y filtros móviles visibles. Faltan los campos de RF-03 y comprobación completa de todos los recorridos con usuarios. |
 | RNF-03 Rendimiento | No verificado | No hay mediciones p95 ni pruebas de concurrencia. La rapidez con seis ejemplos locales no demuestra el requisito. |
-| RNF-04 Disponibilidad | Parcial / no verificado | Préstamos y sesiones ya persisten en D1. Publicaciones, conversaciones y reportes aún usan localStorage. Sin evidencia de recuperación, copias de seguridad o disponibilidad del servicio. |
+| RNF-04 Disponibilidad | Parcial / no verificado | Préstamos y sesiones ya persisten en D1. Catálogos y conversaciones también persisten en D1; publicaciones y reportes aún usan localStorage. Sin evidencia de recuperación, copias de seguridad o disponibilidad del servicio. |
 | RNF-05 Compatibilidad | Parcialmente verificado | Revisión visual en navegador integrado con tamaños de escritorio y móvil. Pendiente ejecutar la matriz Chrome / Edge / Firefox en dispositivos reales. |
-| RNF-06 Escalabilidad | Parcial | Administración agrega carreras/categorías solo en estado del componente. Se pierden al salir y no alimentan formularios ni filtros. Falta catálogo persistente y compartido. |
+| RNF-06 Escalabilidad | Parcial | Catálogo académico persistente y compartido entre perfiles, altas de usuarios, publicaciones y filtros. Renombrar conserva equivalencias con nombres anteriores y actualiza carreras de cuentas. Pendiente validar escalabilidad con carga real. |
 
 ## Cambios de esta entrega
 
@@ -53,7 +53,7 @@ Los documentos originales permanecen fuera del repositorio del programa. La revi
 ## Prioridades siguientes
 
 1. Hashing de contraseñas, limitación de intentos y separación de demostración/producción; las sesiones y permisos de usuarios/préstamos ya existen.
-2. Persistencia de publicaciones, fotografías, catálogos académicos, conversaciones y reportes; alta de nuevas solicitudes de préstamo.
+2. Persistencia de publicaciones, fotografías y reportes; alta de nuevas solicitudes de préstamo.
 3. Completar publicación y filtros con materia y condición según r1.1.
 4. Completar solicitud y aceptación de préstamos, y correos automáticos. La devolución doble para préstamos registrados ya está implementada.
 5. Moderación efectiva, definición de reseñas y pruebas funcionales, de seguridad, carga y compatibilidad.
@@ -99,3 +99,14 @@ La doble confirmación registra la declaración de ambas cuentas; no constituye 
 - Se conservan dos roles, según aclaración del usuario: Estudiante y Administrador. Administración ya incluye creación, edición, suspensión/reactivación y eliminación de cuentas; sus endpoints verifican la sesión y el rol.
 - Inicio presenta dos tarjetas diferenciadas para Mercado y Préstamos. Se eliminan los accesos y mensajes vacíos duplicados, conservando recomendaciones separadas por modalidad cuando existen.
 - Validación: TypeScript, compilación de producción y regresión de cuentas aprobados. Revisión en navegador del inicio, perfil sin entradas editables, navegación a Configuración y guardado exitoso sin salir de la pantalla.
+
+
+## Iteración: catálogo editable y mensajería por participantes (11 de octubre de 2026)
+
+- Carreras y categorías se agregan o renombran en D1. Las carreras renombradas se actualizan en las cuentas; las publicaciones locales resuelven nombres anteriores mediante equivalencias.
+- Cada cambio de catálogo o gestión de cuentas exige la contraseña actual del administrador. El servidor comprueba rol, sesión, origen y contraseña en la operación; la contraseña no se conserva en localStorage. Cinco errores de confirmación bloquean nuevos intentos durante cinco minutos.
+- Se retiran conversaciones simuladas y su almacenamiento compartido en el navegador. Cada hilo pertenece a dos cuentas; ni terceros ni administradores ajenos pueden consultarlo o escribir. El destinatario ve los mensajes recibidos. Actualización periódica cada cinco segundos.
+- Nueva conversación permite buscar al menos dos caracteres del nombre o correo. Por ejemplo, admin encuentra admin123@itesa.edu.mx; hay que seleccionar el resultado, nunca se escoge automáticamente una coincidencia ambigua. Las cuentas suspendidas y la cuenta propia se excluyen de la búsqueda.
+- Comprobación: pruebas aisladas en SQLite de privacidad, identidad del remitente, suspensión, hilos duplicados, persistencia del catálogo, migración de carrera, contraseña y bloqueo. Pruebas de rutas verifican 401/403 y que actorId/senderId enviados por cliente no permiten acceder a un chat ajeno. Regresiones de cuentas y devoluciones, TypeScript y compilación de producción.
+- Revisión de interfaz en escritorio y móvil: edición de categoría, rechazo de contraseña incorrecta, guardado válido y restauración del nombre original; búsqueda, creación de hilo y envío/recepción entre cuentas de prueba.
+- Límite: reportes siguen siendo un prototipo local; su diálogo de confirmación no sustituye una futura API de moderación. No se han añadido notificaciones por correo, cifrado de extremo a extremo ni almacenamiento de publicaciones en servidor.

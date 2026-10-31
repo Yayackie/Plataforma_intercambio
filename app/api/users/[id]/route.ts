@@ -1,3 +1,4 @@
+import { confirmAdmin } from "@/lib/admin-confirm";
 import { NextResponse } from "next/server";
 import { deleteUser, updateUser } from "@/lib/users-db";
 import { AccessError, checkOrigin, requireSession } from "@/lib/session";
@@ -6,7 +7,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   try {
     checkOrigin(request); const actor = await requireSession(request);
     const { id } = await context.params;
-    const body = await request.json() as Partial<UserAccountInput> & { status?: UserAccount["status"] };
+    const body = await request.json() as Partial<UserAccountInput> & { status?: UserAccount["status"]; adminPassword?: string };
+    if (actor.role === "Administrador") await confirmAdmin(actor, body.adminPassword);
     if (actor.role !== "Administrador" && actor.id !== Number(id)) throw new AccessError("No tienes permisos para editar esta cuenta.", 403);
     if (actor.role !== "Administrador" && (body.role !== undefined || body.status !== undefined || body.email !== undefined)) throw new AccessError("No puedes cambiar el rol, correo o estado de tu cuenta.", 403);
     if (body.email !== undefined && (typeof body.email !== "string" || !body.email.trim().toLowerCase().endsWith("@itesa.edu.mx"))) throw new AccessError("El correo debe terminar en @itesa.edu.mx.", 400);
@@ -20,6 +22,7 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
   try {
     checkOrigin(request); const actor = await requireSession(request);
     if (actor.role !== "Administrador") throw new AccessError("No tienes permisos para eliminar usuarios.", 403);
+    const body = await request.json() as {adminPassword?:string}; await confirmAdmin(actor, body.adminPassword);
     const { id } = await context.params; await deleteUser(actor.id, Number(id));
     return NextResponse.json({ ok: true });
   } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : "No fue posible eliminar el usuario." }, { status: error instanceof AccessError ? error.status : 400 }); }

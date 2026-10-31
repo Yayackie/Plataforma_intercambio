@@ -23,3 +23,10 @@ La cuenta prueba789 no puede confirmar ese préstamo. También hay un segundo pr
 Durante la revisión se dejó el multímetro con la devolución informada y la recepción pendiente. Así se puede comprobar directamente el paso 3. En una base nueva ambas confirmaciones comienzan pendientes.
 
 Las confirmaciones se conservan en la base local, no se reinician al recargar. Las cuentas pueden editarse o eliminarse desde administración; la inicialización no restaura contraseñas cambiadas ni cuentas borradas.
+
+
+## Conversaciones y catálogo
+
+En Mensajes, pulsa Nueva conversación y busca parte del nombre o correo (por ejemplo, admin o prueba456). Selecciona la cuenta y escribe. Inicia sesión como destinatario para ver el mensaje recibido; una tercera cuenta no verá ese hilo. Las cuentas sin chats muestran una bandeja vacía.
+
+En Administración > Catálogo institucional, usa el lápiz para renombrar una carrera o categoría. Al guardar, confirma con la contraseña de la cuenta administradora actual (Admin123! para admin123 si no se ha cambiado). Crear, editar, suspender o eliminar usuarios también requiere esta confirmación.

@@ -1,4 +1,5 @@
 import "server-only";
+import { prepareLoanHistory } from "./activity-db";
 import { db, listUsers } from "./users-db";
 import { AccessError } from "./session";
 import type { Loan, UserAccount } from "./marketplace-types";
@@ -11,6 +12,7 @@ async function prepareLoans() {
     borrower_confirmed INTEGER NOT NULL DEFAULT 0, owner_confirmed INTEGER NOT NULL DEFAULT 0,
     CHECK(owner_id != borrower_id), CHECK(owner_confirmed = 0 OR borrower_confirmed = 1)
   )`).run();
+  await prepareLoanHistory();
   const version = "institutional-loans-v1";
   if (await db().prepare("SELECT version FROM app_seed_versions WHERE version = ?").bind(version).first()) return;
   const due = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);

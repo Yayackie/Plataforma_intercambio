@@ -184,3 +184,25 @@ body, .app-shell { background: var(--background); color: var(--foreground); }
 .home-note h2 { font-size: 1.1rem; margin-bottom: 8px; }
 .home-note p { max-width: 650px; color: #5c6d67; line-height: 1.6; }
 @media(max-width:640px) { .destination-grid { grid-template-columns: 1fr; gap: 14px; } .destination-card,.settings-card { padding: 22px; } }
+
+.catalog-entries { list-style:none; padding:0; margin:20px 0; }
+.catalog-entries li { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid #dce4e1; }
+.catalog-entries li span { overflow-wrap:anywhere; min-width:0; }
+.catalog-entries button { flex-shrink:0; }
+.chat-empty { padding:24px; color:#5c6d67; line-height:1.6; }
+.chat-people { display:grid; gap:10px; max-height:320px; overflow:auto; }
+.chat-people button { display:flex; flex-direction:column; align-items:flex-start; height:auto; padding:14px; white-space:normal; overflow-wrap:anywhere; }
+.chat-people small { color:#5c6d67; }
+.chat-panel .bubble p { white-space:pre-wrap; overflow-wrap:anywhere; }
+
+/* Donation forms and activity feed. */
+.activity-list { display: grid; gap: 12px; margin-top: 20px; }
+.activity-list article { padding: 18px 20px; border: 1px solid var(--border); border-radius: 9px; background: #fff; overflow-wrap: anywhere; }
+.activity-list h3 { font-size: 1rem; font-weight: 650; margin-bottom: 6px; }
+.activity-list time { display: block; color: #60716b; font-size: .8rem; margin-top: 10px; }
+.activity-view .filter-bar { grid-template-columns: minmax(0,1fr) minmax(180px,250px); margin-top: 20px; }
+.activity-view select, .donation-dialog select { min-height: 36px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
+.donation-dialog { max-height: 90dvh; overflow-y: auto; }
+.donation-dialog .loan-navigation { margin-bottom: 6px; }
+.donation-dialog .dialog-actions { margin-top: 16px; gap: 10px; flex-wrap: wrap; }
+@media(max-width:640px) { .activity-view .filter-bar { grid-template-columns: 1fr; } }

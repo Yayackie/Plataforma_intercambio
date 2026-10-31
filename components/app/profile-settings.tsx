@@ -2,10 +2,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { careers } from "@/lib/demo-data";
+import { useCatalog } from "./catalog-context";
 import type { UserAccount, UserAccountInput } from "@/lib/marketplace-types";
 
 export function ProfileSettings({ user, onSave, onCancel }: { user: UserAccount; onSave: (changes: Partial<UserAccountInput>) => Promise<void>; onCancel: () => void }) {
+  const {careers,categories}=useCatalog();
   const [name, setName] = useState(user.name);
   const [career, setCareer] = useState(user.career ?? careers[0]);
   const [semester, setSemester] = useState(user.semester ?? 1);

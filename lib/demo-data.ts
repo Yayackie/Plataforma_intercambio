@@ -1,4 +1,4 @@
-import type { Conversation, Listing, Report, UserAccount } from "./marketplace-types";
+import type { Listing, Report, UserAccount } from "./marketplace-types";
 export const careers = ["Ingeniería en Industrias Alimentarias", "Ingeniería Mecatrónica", "Ingeniería Automotriz"];
 export const categories = ["Equipos / Instrumentación", "Insumos / Consumibles", "Seguridad / Higiene", "Material didáctico"] as const;
 export const initialListings: Listing[] = [
@@ -8,10 +8,6 @@ export const initialListings: Listing[] = [
   { id: 4, title: "Kit Arduino Uno", description: "Incluye protoboard, jumpers, LEDs y sensores básicos.", category: "Equipos / Instrumentación", mode: "Venta", status: "Disponible", condition: "Excelente", career: "Ingeniería Mecatrónica", semester: 5, owner: "Jorge L.", price: 650, accent: "#a89bff", icon: "box" },
   { id: 5, title: "Vidriería básica", description: "Dos matraces y tres vasos de precipitados.", category: "Equipos / Instrumentación", mode: "Préstamo", status: "Prestado", condition: "Bueno", career: "Ingeniería en Industrias Alimentarias", semester: 3, owner: "Tú", returnDays: 7, accent: "#ffcf5a", icon: "flask", mine: true },
   { id: 6, title: "Formulario de estática", description: "Apuntes claros, tablas y problemas tipo examen.", category: "Material didáctico", mode: "Donación", status: "Disponible", condition: "Bueno", career: "Ingeniería Automotriz", semester: 2, owner: "Tú", accent: "#5be7b7", icon: "calc", mine: true },
-];
-export const initialConversations: Conversation[] = [
-  { id: 1, person: "Diego Martínez", listing: "Multímetro digital", avatar: "DM", online: true, messages: [{ from: "them", text: "¡Hola! Sí está disponible. ¿Lo necesitas para esta semana?", time: "10:14" }, { from: "me", text: "Sí, para la práctica del jueves. Puedo entregarlo el lunes.", time: "10:16" }, { from: "them", text: "Perfecto. Nos vemos junto al laboratorio de Mecatrónica.", time: "10:18" }] },
-  { id: 2, person: "Renata García", listing: "Cálculo vectorial", avatar: "RG", online: false, messages: [{ from: "them", text: "El libro sigue disponible 🙂", time: "Ayer" }] },
 ];
 export const initialReports: Report[] = [{ id: 1, target: "Kit de herramientas industrial", type: "Publicación", reason: "La descripción no coincide con el artículo entregado.", reporter: "Mariana P.", resolved: false }, { id: 2, target: "Usuario: Carlos N.", type: "Usuario", reason: "No se presentó en dos entregas acordadas.", reporter: "Luis A.", resolved: false }, { id: 3, target: "Calculadora científica", type: "Publicación", reason: "Precio potencialmente engañoso.", reporter: "Ana V.", resolved: true }];
 export const initialUsers: UserAccount[] = [
