@@ -5,6 +5,7 @@ import { prepareDonations, validateArticle } from "./donations-db";
 import type { UserAccount } from "./marketplace-types";
 import type { PublicDonation } from "./public-donation-types";
 
+import { validateImage } from "./image-validation";
 async function prepare() {
   await prepareDonations();
   await db().prepare(`CREATE TABLE IF NOT EXISTS public_donations (
@@ -14,6 +15,7 @@ async function prepare() {
     selection_token TEXT, created_at TEXT NOT NULL,
     CHECK(status IN ('Disponible','Asignada','Retirada'))
   )`).run();
+  await db().prepare("CREATE TABLE IF NOT EXISTS donation_images (offer_id INTEGER PRIMARY KEY, image TEXT NOT NULL)").run();
   await db().prepare(`CREATE TABLE IF NOT EXISTS donation_requests (
     offer_id INTEGER NOT NULL, user_id INTEGER NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(offer_id,user_id)
   )`).run();
@@ -47,20 +49,23 @@ async function prepare() {
 }
 export async function getPublicDonations(actor: UserAccount): Promise<PublicDonation[]> {
   await prepare();
-  const rows = await db().prepare(`SELECT p.*,u.name FROM public_donations p JOIN users u ON u.id=p.donor_id
+  const rows = await db().prepare(`SELECT p.*,u.name,im.image FROM public_donations p JOIN users u ON u.id=p.donor_id LEFT JOIN donation_images im ON im.offer_id=p.id
     WHERE (p.status='Disponible' AND u.status='Activo') OR p.donor_id=? OR EXISTS(SELECT 1 FROM donation_requests WHERE offer_id=p.id AND user_id=?)
     ORDER BY p.id DESC`).bind(actor.id,actor.id).all<Record<string,unknown>>();
   const requests = await db().prepare(`SELECT r.*,u.name,u.status FROM donation_requests r JOIN users u ON u.id=r.user_id
     JOIN public_donations p ON p.id=r.offer_id WHERE p.donor_id=? OR r.user_id=?`).bind(actor.id,actor.id).all<Record<string,unknown>>();
   return rows.results.map(r => ({id:Number(r.id),donorId:Number(r.donor_id),donorName:String(r.name),title:String(r.title),description:String(r.description),condition:String(r.condition),
-    demo:!!r.demo_key,status:r.status as PublicDonation['status'],createdAt:String(r.created_at),
+    image:r.image?String(r.image):undefined,demo:!!r.demo_key,status:r.status as PublicDonation['status'],createdAt:String(r.created_at),
     requested:requests.results.some(q=>q.offer_id===r.id && q.user_id===actor.id), selected:Number(r.selected_id)===actor.id,
     applicants:Number(r.donor_id)===actor.id ? requests.results.filter(q=>q.offer_id===r.id && q.status==='Activo').map(q=>({id:Number(q.user_id),name:String(q.name)})) : []}));
 }
 export async function publishDonation(actor: UserAccount, input: Record<string,unknown>) {
   await prepare(); const article=validateArticle(input);
-  await db().prepare('INSERT INTO public_donations(donor_id,title,description,condition,created_at) VALUES(?,?,?,?,?)')
-    .bind(actor.id,article.title,article.description,article.condition,new Date().toISOString()).run();
+  const image=validateImage(input.image);
+  await db().batch([
+    db().prepare('INSERT INTO public_donations(donor_id,title,description,condition,created_at) VALUES(?,?,?,?,?)').bind(actor.id,article.title,article.description,article.condition,new Date().toISOString()),
+    db().prepare('INSERT INTO donation_images(offer_id,image) SELECT last_insert_rowid(),? WHERE ? IS NOT NULL').bind(image,image)
+  ]);
 }
 export async function actOnPublicDonation(actor: UserAccount, input: Record<string,unknown>) {
   await prepare(); const {id,action,recipientId}=input;

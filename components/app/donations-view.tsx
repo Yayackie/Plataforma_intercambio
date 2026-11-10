@@ -32,7 +32,7 @@ export function DonationsView({ userId, onSearch, onContact }: { userId: number;
       catch (e) { if (active) setError(e instanceof Error ? e.message : "No se pudieron cargar las donaciones."); }
       finally { if (active) setLoading(false); }
     }
-    void refresh(); const timer = setInterval(refresh, 5000);
+    void refresh(); const timer = setInterval(refresh, 2000);
     return () => { active = false; clearInterval(timer); };
   }, []);
   useEffect(() => {
@@ -58,14 +58,14 @@ export function DonationsView({ userId, onSearch, onContact }: { userId: number;
   return <section className="view-section"><div className="section-heading"><div><h1>Donaciones</h1><p>Dona a la comunidad o a una persona. Explora artículos gratuitos y confirma tus entregas.</p></div><Button onClick={() => { setFormError(""); setOpen(true); }}>Donar un artículo</Button></div>
     <div className="loan-navigation" aria-label="Secciones de donaciones"><Button variant={tab === "explore" ? "default" : "outline"} onClick={() => setTab("explore")}>Explorar</Button><Button variant={tab === "sent" ? "default" : "outline"} onClick={() => setTab("sent")}>Mis donaciones</Button><Button variant={tab === "received" ? "default" : "outline"} onClick={() => setTab("received")}>Solicitudes y recibidas</Button></div>
     <PublicDonations userId={userId} mode={tab === "explore" ? "explore" : tab === "sent" ? "mine" : "requests"} revision={revision} />
-    {tab !== "explore" && <><h2>En proceso y propuestas privadas</h2>
-    {error && <p role="alert">{error}</p>}{loading ? <p role="status">Cargando donaciones…</p> : !error && !visible.length ? <div className="empty-state"><p>No tienes propuestas privadas {tab === "sent" ? "enviadas" : "recibidas"}.</p></div> : null}
+    {tab !== "explore" && <><h2>Acuerdos de entrega</h2><p className="section-help">Aquí aparecen las donaciones dirigidas a una persona, ya sea que la hayas elegido entre los solicitantes o le hayas enviado una propuesta directamente. Solo los dos participantes pueden ver y confirmar la entrega.</p>
+    {error && <p role="alert">{error}</p>}{loading ? <p role="status">Cargando donaciones…</p> : !error && !visible.length ? <div className="empty-state"><p>No tienes acuerdos de donación {tab === "sent" ? "enviadas" : "recibidas"}.</p></div> : null}
     <div className="loan-grid">{visible.map(d => {
       const donor = d.donorId === userId;
       const actions: {action: DonationAction; label: string}[] = donor
         ? [...(d.status === "Aceptada" ? [{action: "deliver" as const, label: "Informar entrega"}] : []), ...(["Pendiente", "Aceptada"].includes(d.status) ? [{action: "cancel" as const, label: "Cancelar donación"}] : [])]
         : d.status === "Pendiente" ? [{action: "accept", label: "Aceptar"}, {action: "reject", label: "Rechazar"}] : d.status === "Entrega informada" ? [{action: "receive", label: "Confirmar recepción"}] : [];
-      return <article className="loan-card" key={d.id}><p className="eyebrow">{d.status}</p><h2>{d.title}</h2><p>{donor ? "Para" : "De"}: {donor ? d.recipientName : d.donorName}</p><p style={{whiteSpace: "pre-wrap", overflowWrap: "anywhere"}}>{d.description}</p><p>Estado físico: {d.condition}</p><small>Actualizada: {new Date(d.updatedAt).toLocaleString("es-MX")}</small>
+      return <article className="loan-card donation-card" key={d.id}><p className="eyebrow">{d.status}</p><h2>{d.title}</h2><p>{donor ? "Para" : "De"}: {donor ? d.recipientName : d.donorName}</p><p style={{whiteSpace: "pre-wrap", overflowWrap: "anywhere"}}>{d.description}</p><p>Estado físico: {d.condition}</p><small>Actualizada: {new Date(d.updatedAt).toLocaleString("es-MX")}</small>
         {d.status === "Entrega informada" && <p>El donante informó la entrega. Falta confirmar la recepción.</p>}
         <div className="dialog-actions" style={{flexWrap: "wrap"}}>{actions.map(a => <Button key={a.action} disabled={busy} onClick={() => { setError(""); setConfirmation({item: d, ...a}); }}>{a.label}</Button>)}<Button variant="outline" disabled={busy} onClick={async () => { setBusy(true); try { await onContact(donor ? d.recipientId : d.donorId); } catch (e) { setError(e instanceof Error ? e.message : "No se pudo abrir el chat."); } finally { setBusy(false); } }}>Enviar mensaje</Button></div></article>;
     })}</div>

@@ -59,15 +59,15 @@ function load(name) {
  await assert.rejects(confirmation.confirmAdmin(admin,'wrong'),e=>e.status===403);
  await confirmation.confirmAdmin(admin,'Admin123!');
  const initial=await catalog.getCatalog();const career=initial.find(e=>e.name===a.career);
- await catalog.saveCatalog({id:career.id,name:'Ingeniería de Prueba'});
- assert.equal((await users.login(a.email,'Prueba123!')).career,'Ingeniería de Prueba');
- assert.equal((await catalog.getCatalog()).length,initial.length);
- assert.equal((await catalog.getCatalog()).find(e=>e.id===career.id).aliases[0],a.career);
- await assert.rejects(catalog.saveCatalog({kind:'career',name:a.career}),e=>e.status===409);
- await catalog.saveCatalog({id:career.id,name:a.career});
- assert.equal((await users.login(a.email,'Prueba123!')).career,a.career);
+ await assert.rejects(catalog.saveCatalog({id:career.id,name:'Renombrada'}),e=>e.status===400);
+ await catalog.saveCatalog({id:career.id,enabled:false});assert.equal((await catalog.getCatalog()).find(e=>e.id===career.id).enabled,false);
+ await catalog.saveCatalog({id:career.id,enabled:true});assert.equal((await catalog.getCatalog()).find(e=>e.id===career.id).enabled,true);
  await catalog.saveCatalog({kind:'category',name:'Nueva categoría de prueba'});
- assert.equal((await catalog.getCatalog()).length,initial.length+1);
+ const category=(await catalog.getCatalog()).find(e=>e.name==='Nueva categoría de prueba');
+ await catalog.saveCatalog({id:category.id,name:'Categoría editada'});
+ assert.equal((await catalog.getCatalog()).find(e=>e.id===category.id).name,'Categoría editada');
+ await catalog.saveCatalog({id:category.id,action:'delete'});
+ assert.equal((await catalog.getCatalog()).length,initial.length);
  function route(path) {
   const exports={}; const source=ts.transpileModule(readFileSync(`app/api/${path}/route.ts`,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
   runInNewContext(source,{exports,require(name){if(name==='next/server')return {NextResponse:{json:(data,options)=>new Response(JSON.stringify(data),options)}};if(name.startsWith('@/lib/'))return load(name.slice(6));throw Error(name);},URL});return exports;

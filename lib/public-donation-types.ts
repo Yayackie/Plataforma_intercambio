@@ -1,4 +1,4 @@
-export interface PublicDonation {
+export interface PublicDonation { image?:string;
   id: number; donorId: number; donorName: string; title: string; description: string; condition: string;
   demo: boolean; createdAt: string; status: "Disponible" | "Asignada" | "Retirada";
   requested: boolean; selected: boolean;

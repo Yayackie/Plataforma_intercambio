@@ -1,5 +1,5 @@
 import type { Listing, Report, UserAccount } from "./marketplace-types";
-export const careers = ["Ingeniería en Industrias Alimentarias", "Ingeniería Mecatrónica", "Ingeniería Automotriz"];
+export const careers = ["Ingeniería en Sistemas Computacionales", "Ingeniería Electromecánica", "Ingeniería en Industrias Alimentarias", "Ingeniería Civil", "Ingeniería Mecatrónica", "Ingeniería en Gestión Empresarial", "Ingeniería en Logística", "Ingeniería en Sistemas Automotrices", "Licenciatura en Administración", "Licenciatura en Turismo", "Maestría en Sistemas Computacionales", "Maestría en Ciencias en Alimentos"];
 export const categories = ["Equipos / Instrumentación", "Insumos / Consumibles", "Seguridad / Higiene", "Material didáctico"] as const;
 export const initialListings: Listing[] = [
   { id: 1, title: "Multímetro digital", description: "Con puntas y funda. Ideal para prácticas de circuitos.", category: "Equipos / Instrumentación", mode: "Préstamo", status: "Disponible", condition: "Excelente", career: "Ingeniería Mecatrónica", semester: 4, owner: "Diego M.", returnDays: 5, accent: "#d8ff3e", icon: "tool" },

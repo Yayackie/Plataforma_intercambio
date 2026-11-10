@@ -13,6 +13,9 @@ async function prepareLoans() {
     CHECK(owner_id != borrower_id), CHECK(owner_confirmed = 0 OR borrower_confirmed = 1)
   )`).run();
   await prepareLoanHistory();
+  await db().prepare(`CREATE TRIGGER IF NOT EXISTS loan_activity_created AFTER INSERT ON loans BEGIN
+    INSERT INTO activity_events(user_id,category,title,detail,occurred_at) VALUES(NEW.borrower_id,'Préstamo',NEW.item,'Préstamo aprobado',strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+  END`).run();
   const version = "institutional-loans-v1";
   if (await db().prepare("SELECT version FROM app_seed_versions WHERE version = ?").bind(version).first()) return;
   const due = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);

@@ -13,7 +13,7 @@ import type { CatalogEntry } from "@/lib/catalog-db";
 import type { Report, UserAccount, UserAccountInput } from "@/lib/marketplace-types";
 
 type Props = {
-  entries: CatalogEntry[]; onSaveCatalog: (input:{id?:number;kind:string;name:string})=>Promise<void>;
+  entries: CatalogEntry[]; onSaveCatalog: (input:import("@/lib/catalog-db").CatalogChange)=>Promise<void>;
   reports: Report[]; users: UserAccount[]; currentUserId: number;
   onResolve: (id: number, action: "hide" | "suspend" | "dismiss") => void;
   onAddUser: (user: UserAccountInput & { password: string }) => Promise<void>;
