@@ -39,3 +39,8 @@ export async function requireSession(request: Request) {
   if (!row || !String(row.email).toLowerCase().endsWith("@itesa.edu.mx")) throw new AccessError("Tu sesión venció. Vuelve a iniciar sesión.");
   return present(row);
 }
+
+export async function revokeOtherSessions(userId:number,request:Request){
+  await prepareSessions();
+  await db().prepare('DELETE FROM user_sessions WHERE user_id=? AND token_hash!=?').bind(userId,await digest(tokenFrom(request))).run();
+}

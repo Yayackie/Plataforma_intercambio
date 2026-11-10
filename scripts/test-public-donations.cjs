@@ -68,6 +68,23 @@ function load(name) {
  await pub.actOnPublicDonation(a,{id:own.id,action:'withdraw'});assert.ok(!(await pub.getPublicDonations(b)).some(o=>o.id===own.id));
  const hidden=await privateDonations.createDonation(a,{recipientId:b.id,title:'Privada',description:'No publicar',condition:'Bueno'});
  assert.ok(!(await pub.getPublicDonations(c)).some(o=>o.title==='Privada'));
+ await pub.publishDonation(b,{title:'Oferta que se rechaza',description:'Regresa al catálogo',condition:'Bueno'});
+ const reopening=(await pub.getPublicDonations(b)).find(o=>o.title==='Oferta que se rechaza');
+ await pub.actOnPublicDonation(a,{id:reopening.id,action:'request'});await pub.actOnPublicDonation(c,{id:reopening.id,action:'request'});
+ await pub.actOnPublicDonation(b,{id:reopening.id,action:'select',recipientId:a.id});
+ const rejected=(await privateDonations.getDonations(a)).find(d=>d.title==='Oferta que se rechaza');
+ await privateDonations.updateDonation(a,rejected.id,'reject');
+ const reopened=(await pub.getPublicDonations(b)).find(o=>o.id===reopening.id);assert.equal(reopened.status,'Disponible');assert.equal(reopened.applicants.length,1);assert.equal(reopened.applicants[0].id,c.id);
+ assert.equal((await pub.getPublicDonations(a)).find(o=>o.id===reopening.id).requested,false);
+ assert.equal((await privateDonations.getDonations(a)).find(d=>d.id===rejected.id).status,'Rechazada');
+ await pub.actOnPublicDonation(b,{id:reopening.id,action:'select',recipientId:c.id});
+ await assert.rejects(privateDonations.updateDonation(a,rejected.id,'reject'),e=>e.status===409);
+ assert.equal((await pub.getPublicDonations(b)).find(o=>o.id===reopening.id).status,'Asignada');
+ // Simulate an already rejected agreement from the previous deployment.
+ const historical=database.prepare('SELECT donation_id FROM public_donations WHERE id=?').get(reopening.id);
+ database.exec('DROP TRIGGER donation_rejected_reopens_offer');database.prepare("UPDATE donations SET status='Rechazada' WHERE id=?").run(historical.donation_id);
+ assert.equal((await pub.getPublicDonations(a)).find(o=>o.id===reopening.id).status,'Disponible');
+ const privateGift=(await privateDonations.getDonations(b)).find(d=>d.title==='Privada');await privateDonations.updateDonation(b,privateGift.id,'reject');assert.ok(!(await pub.getPublicDonations(c)).some(o=>o.title==='Privada'));
  const loans=load('loans-db');const snapshot=await loans.getLoans(a);const loan=snapshot.loans.find(l=>l.role==='owner');
  await loans.confirmReturn(b,loan.id);await loans.confirmReturn(a,loan.id);
  assert.ok((await activity.getActivity(a.id)).some(e=>e.category==='Préstamo'&&e.detail.includes('confirmada')));

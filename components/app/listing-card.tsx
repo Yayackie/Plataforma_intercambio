@@ -1,16 +1,19 @@
 "use client";
+import { useState } from "react";
+import { ResourceDetail } from "./resource-detail";
 import { BookOpen, Box, Calculator, FlaskConical, MoreHorizontal, ShieldCheck, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import type { Listing } from "@/lib/marketplace-types";
 const icons = { tool: Wrench, book: BookOpen, shield: ShieldCheck, flask: FlaskConical, calc: Calculator, box: Box };
 export function ListingCard({ item, onMessage, onReport, compact = false }: { item: Listing; onMessage: () => void; onReport: () => void; compact?: boolean }) {
+  const [open,setOpen]=useState(false);
   const Icon = icons[item.icon];
-  return <article className={`listing-card ${compact ? "listing-card--compact" : ""}`}>
+  return <><article className={`listing-card resource-card ${compact ? "listing-card--compact" : ""}`} onClick={event=>{if(!(event.target as HTMLElement).closest("button,a,[role=menuitem]"))setOpen(true);}}>
     <div className="listing-art" style={{ "--item-accent": item.accent } as React.CSSProperties}><span className="mode-chip">{item.mode}</span>{item.image?<img src={item.image} alt={item.title} className="resource-photo"/>:<Icon aria-hidden="true" />}</div>
-    <div className="listing-body"><div className="listing-heading"><div><p className="eyebrow">{item.category}</p><h3>{item.title}</h3></div><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Opciones para ${item.title}`}><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={onReport}>Reportar publicación</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div>
+    <div className="listing-body"><div className="listing-heading"><div><p className="eyebrow">{item.category}</p><h3><button className="resource-title" onClick={()=>setOpen(true)}>{item.title}</button></h3></div><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Opciones para ${item.title}`}><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={onReport}>Reportar publicación</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div>
       {!compact && <p className="listing-description">{item.description}</p>}<div className="listing-meta"><span className={`status-dot status-${item.status.toLowerCase().replace(" ", "-")}`}>{item.status}</span><span>Sem. {item.semester}</span><span>{item.condition}</span></div>
       <div className="listing-footer"><div><span className="owner-avatar">{item.owner.slice(0, 1)}</span><span>{item.owner}</span></div><strong>{item.mode === "Venta" ? `$${item.price}` : item.mode === "Préstamo" ? `${item.returnDays} días` : "Sin costo"}</strong></div>
       <Button disabled={item.mine || item.requested || item.status !== "Disponible"} className="card-action" onClick={onMessage}>{item.requested ? "Solicitud enviada" : item.mode === "Venta" ? "Me interesa" : item.mode === "Préstamo" ? "Solicitar préstamo" : "Solicitar donación"}</Button>
-    </div></article>;
+    </div></article><ResourceDetail open={open} onOpenChange={setOpen} title={item.title} description={item.description} image={item.image} details={[["Modalidad",item.mode],["Estado",item.status],["Condición",item.condition],["Categoría",item.category],["Carrera",item.career],["Semestre",String(item.semester)],["Publicado por",item.owner],[item.mode==="Venta"?"Precio":"Plazo",item.mode==="Venta"?`${item.price} MXN`:`${item.returnDays} días`]]}><Button disabled={item.mine||item.requested||item.status!=="Disponible"} onClick={()=>{setOpen(false);onMessage();}}>{item.requested?"Solicitud enviada":item.mode==="Venta"?"Me interesa":"Solicitar préstamo"}</Button></ResourceDetail></>;
 }

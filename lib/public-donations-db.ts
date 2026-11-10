@@ -29,14 +29,31 @@ async function prepare() {
     INSERT INTO activity_events(user_id,category,title,detail,occurred_at)
       SELECT donor_id,'Donación',title,'Nueva solicitud recibida',NEW.created_at FROM public_donations WHERE id=NEW.offer_id;
   END`).run();
-  await db().prepare(`CREATE TRIGGER IF NOT EXISTS public_donation_state AFTER UPDATE OF status ON public_donations WHEN OLD.status != NEW.status BEGIN
+  await db().prepare('DROP TRIGGER IF EXISTS public_donation_state').run();
+  await db().prepare(`CREATE TRIGGER IF NOT EXISTS public_donation_state_v2 AFTER UPDATE OF status ON public_donations WHEN OLD.status != NEW.status BEGIN
     INSERT INTO activity_events(user_id,category,title,detail,occurred_at) VALUES(NEW.donor_id,'Donación',NEW.title,
       'Publicación: ' || NEW.status,strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     INSERT INTO activity_events(user_id,category,title,detail,occurred_at)
       SELECT user_id,'Donación',NEW.title,
-        CASE WHEN NEW.status='Retirada' THEN 'El donante retiró la publicación' WHEN user_id=NEW.selected_id THEN 'Seleccionado para recibir el artículo' ELSE 'Artículo asignado a otra persona' END,
+        CASE WHEN NEW.status='Disponible' THEN 'El artículo vuelve a estar disponible' WHEN NEW.status='Retirada' THEN 'El donante retiró la publicación' WHEN user_id=NEW.selected_id THEN 'Seleccionado para recibir el artículo' ELSE 'Artículo asignado a otra persona' END,
         strftime('%Y-%m-%dT%H:%M:%fZ','now') FROM donation_requests WHERE offer_id=NEW.id;
   END`).run();
+  // Rejection and reopening happen in the same SQLite transaction. Only the
+  // currently linked agreement can release the offer; older agreements cannot.
+  await db().prepare(`CREATE TRIGGER IF NOT EXISTS donation_rejected_reopens_offer
+    AFTER UPDATE OF status ON donations WHEN NEW.status='Rechazada' AND OLD.status!='Rechazada' BEGIN
+    DELETE FROM donation_requests WHERE user_id=NEW.recipient_id AND offer_id IN
+      (SELECT id FROM public_donations WHERE donation_id=NEW.id AND status='Asignada');
+    UPDATE public_donations SET status='Disponible',selected_id=NULL,donation_id=NULL,selection_token=NULL
+      WHERE donation_id=NEW.id AND status='Asignada';
+  END`).run();
+  // Repair offers rejected before this fix without exposing direct/private gifts.
+  await db().batch([
+    db().prepare(`DELETE FROM donation_requests WHERE EXISTS(SELECT 1 FROM public_donations p JOIN donations d ON d.id=p.donation_id
+      WHERE p.id=donation_requests.offer_id AND p.status='Asignada' AND d.status='Rechazada' AND d.recipient_id=donation_requests.user_id)`),
+    db().prepare(`UPDATE public_donations SET status='Disponible',selected_id=NULL,donation_id=NULL,selection_token=NULL
+      WHERE status='Asignada' AND donation_id IN(SELECT id FROM donations WHERE status='Rechazada')`),
+  ]);
   // Stable keys preserve user changes and prevent duplicate examples on refresh.
   const examples = [
     ['donation-demo-coat-v1','prueba456@itesa.edu.mx','Bata de laboratorio','Talla M, limpia y sin roturas. Artículo ficticio para probar el flujo.','Muy bueno'],

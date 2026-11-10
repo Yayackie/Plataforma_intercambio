@@ -123,7 +123,7 @@ export function useMarketplace(currentUser: UserAccount | null) {
     const result = await api<{ user: UserAccount }>("/api/users", { method: "POST", body: JSON.stringify({ ...user, actorId, adminPassword }) });
     setUsers((items) => [...items, result.user]); return result.user;
   }
-  async function updateUser(actorId: number, id: number, changes: Partial<UserAccountInput> & { status?: UserAccount["status"] }, adminPassword?:string) {
+  async function updateUser(actorId: number, id: number, changes: Partial<UserAccountInput> & { currentPassword?:string; status?: UserAccount["status"] }, adminPassword?:string) {
     const result = await api<{ user: UserAccount }>(`/api/users/${id}`, { method: "PATCH", body: JSON.stringify({ ...changes, actorId, adminPassword }) });
     setUsers((items) => items.map((user) => user.id === id ? result.user : user)); return result.user;
   }

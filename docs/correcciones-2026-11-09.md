@@ -22,3 +22,14 @@
 ## Operación
 
 No se borra ni reinicializa la base existente. Las tablas complementarias se crean de forma aditiva, como en los módulos existentes. Las fotos y conversaciones completas se consultan periódicamente; para un despliegue con gran volumen conviene separar imágenes a R2 y paginar/sincronizar solo cambios.
+
+## Ajustes de experiencia posteriores
+
+- Se retiró el aviso general de artículos de demostración solicitado.
+- Audio: chime de dos notas con caída suave de aproximadamente 1.5 segundos; control mediante icono de altavoz activo/silenciado con etiqueta accesible.
+- Mi cuenta: interruptor claro/nocturno con sol/luna. La preferencia se conserva en este navegador y se aplica también a diálogos y formularios.
+- Perfil: contraseña actual, nueva y confirmación; cambio centralizado de la credencial. Administración mantiene su función de restablecimiento. No se muestran ni devuelven contraseñas; otras sesiones de la cuenta quedan invalidadas.
+- Tarjetas de mercado, préstamos y donaciones: clic en la tarjeta o su título abre la información completa; fotografía sin recortar y opción de ampliarla. Los botones de acciones no abren accidentalmente el detalle.
+- Botón Mensaje junto a solicitantes de préstamo y donación, enlazado con su conversación privada.
+- Al rechazar una donación vinculada a una oferta pública, se libera la misma publicación de forma transaccional, se conserva el historial rechazado y se mantienen los otros solicitantes. También se reparan las ofertas que habían quedado asignadas tras un rechazo anterior. Las donaciones dirigidas a una persona que nunca fueron públicas siguen siendo privadas.
+- Validación adicional: test-profile-password.cjs y casos de rechazo/reasignación/recuperación histórica en test-public-donations.cjs; pruebas existentes de catálogo, mensajes y publicaciones compartidas; revisión visual del tema, interruptor, audio y foto completa.
