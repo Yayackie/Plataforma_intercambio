@@ -98,3 +98,15 @@ export async function changeListing(actor: UserAccount,input: Record<string,unkn
     AND NOT EXISTS(SELECT 1 FROM loans WHERE listing_id=listings.id AND owner_confirmed=0)`).bind(status,id,actor.id).run();
   if(!result.meta.changes) throw new AccessError('No puedes cambiar este estado mientras el recurso está prestado.',409);
 }
+
+export async function deleteListing(actor:UserAccount,id:unknown) {
+  if(!Number.isSafeInteger(id))throw new AccessError('Publicación inválida.',400);
+  await prepareListings();
+  await db().prepare('CREATE TABLE IF NOT EXISTS listing_reports(id INTEGER PRIMARY KEY AUTOINCREMENT, listing_id INTEGER NOT NULL, reporter_id INTEGER NOT NULL, resolved INTEGER NOT NULL DEFAULT 0, UNIQUE(listing_id,reporter_id))').run();
+  const result=await db().batch([
+    db().prepare('DELETE FROM loan_requests WHERE listing_id IN(SELECT id FROM listings WHERE id=? AND owner_id=?)').bind(id,actor.id),
+    db().prepare('DELETE FROM listing_reports WHERE listing_id IN(SELECT id FROM listings WHERE id=? AND owner_id=?)').bind(id,actor.id),
+    db().prepare('DELETE FROM listings WHERE id=? AND owner_id=?').bind(id,actor.id),
+  ]);
+  if(!result[2].meta.changes)throw new AccessError('La publicación no existe o no te pertenece.',404);
+}

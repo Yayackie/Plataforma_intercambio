@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireSession, checkOrigin, AccessError } from "@/lib/session";
-import { getPublicDonations,publishDonation,actOnPublicDonation } from "@/lib/public-donations-db";
+import { getPublicDonations,publishDonation,actOnPublicDonation,deletePublicDonation } from "@/lib/public-donations-db";
 export async function GET(request:Request) {
   try { return NextResponse.json({offers:await getPublicDonations(await requireSession(request))},{headers:{'Cache-Control':'no-store'}}); } catch(e){return failure(e);}
 }
@@ -14,3 +14,5 @@ async function mutate(request:Request,create:boolean) {
 export const POST=(r:Request)=>mutate(r,true);
 export const PATCH=(r:Request)=>mutate(r,false);
 function failure(e:unknown){return NextResponse.json({error:e instanceof AccessError?e.message:'No se pudo completar la operación.'},{status:e instanceof AccessError?e.status:e instanceof SyntaxError?400:500});}
+
+export async function DELETE(request:Request){try{checkOrigin(request);const actor=await requireSession(request);const body=await request.json() as {id?:unknown}|null;await deletePublicDonation(actor,body?.id);return NextResponse.json({ok:true});}catch(e){return failure(e);}}

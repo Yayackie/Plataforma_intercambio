@@ -92,6 +92,11 @@ export function useMarketplace(currentUser: UserAccount | null) {
     const result=await api<{listings:Listing[]}>('/api/listings',{method:'PATCH',body:JSON.stringify(body)});
     generation.current++;if(actorRef.current===actor)setListings(result.listings);
   }
+  async function deleteListing(id:number) {
+    generation.current++;const actor=actorRef.current;
+    const result=await api<{listings:Listing[]}>('/api/listings',{method:'DELETE',body:JSON.stringify({id})});
+    generation.current++;if(actorRef.current===actor)setListings(result.listings);
+  }
   async function updateStatus(id:number,status:Listing['status']) {await changeListing({id,action:'status',status});}
   async function requestLoan(id:number){await changeListing({id,action:'request'});}
   async function lend(id:number,recipientId:number){await changeListing({id,action:'lend',recipientId});}
@@ -130,5 +135,5 @@ export function useMarketplace(currentUser: UserAccount | null) {
   async function toggleUser(actorId: number, user: UserAccount, adminPassword?:string) { return updateUser(actorId, user.id, { status: user.status === "Activo" ? "Suspendido" : "Activo" }, adminPassword); }
   async function deleteUser(actorId: number, id: number, adminPassword?:string) { await api(`/api/users/${id}`, { method: "DELETE", body: JSON.stringify({ actorId, adminPassword }) }); setUsers((items) => items.filter((user) => user.id !== id)); }
 
-  return { notifications, markRead, readSection, requestLoan, lend, entries, catalogError, messagesError, searchPeople, startChat, saveCatalog, verifyAdmin, listings, loans, reports, conversations, users, hydrated: localReady, loansLoading, loansError, loanStates, signOut, stats, addListing, updateStatus, reportListing, confirmLoan, resolveReport, sendMessage, authenticate, addUser, updateUser, toggleUser, deleteUser };
+  return { deleteListing, notifications, markRead, readSection, requestLoan, lend, entries, catalogError, messagesError, searchPeople, startChat, saveCatalog, verifyAdmin, listings, loans, reports, conversations, users, hydrated: localReady, loansLoading, loansError, loanStates, signOut, stats, addListing, updateStatus, reportListing, confirmLoan, resolveReport, sendMessage, authenticate, addUser, updateUser, toggleUser, deleteUser };
 }

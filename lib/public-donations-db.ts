@@ -54,6 +54,7 @@ async function prepare() {
     db().prepare(`UPDATE public_donations SET status='Disponible',selected_id=NULL,donation_id=NULL,selection_token=NULL
       WHERE status='Asignada' AND donation_id IN(SELECT id FROM donations WHERE status='Rechazada')`),
   ]);
+  await db().prepare('CREATE TABLE IF NOT EXISTS deleted_donation_examples (demo_key TEXT PRIMARY KEY)').run();
   // Stable keys preserve user changes and prevent duplicate examples on refresh.
   const examples = [
     ['donation-demo-coat-v1','prueba456@itesa.edu.mx','Bata de laboratorio','Talla M, limpia y sin roturas. Artículo ficticio para probar el flujo.','Muy bueno'],
@@ -61,8 +62,8 @@ async function prepare() {
     ['donation-demo-rulers-v1','prueba123@itesa.edu.mx','Juego de escuadras','Dos piezas para dibujo técnico. Artículo ficticio para probar el flujo.','Excelente'],
   ];
   await db().batch(examples.map(([key,email,title,description,condition]) => db().prepare(`INSERT INTO public_donations(donor_id,title,description,condition,demo_key,created_at)
-    SELECT id,?,?,?,?,? FROM users WHERE email=? AND status='Activo' AND NOT EXISTS(SELECT 1 FROM public_donations WHERE demo_key=?)
-    ON CONFLICT(demo_key) DO NOTHING`).bind(title,description,condition,key,new Date().toISOString(),email,key)));
+    SELECT id,?,?,?,?,? FROM users WHERE email=? AND status='Activo' AND NOT EXISTS(SELECT 1 FROM public_donations WHERE demo_key=?) AND NOT EXISTS(SELECT 1 FROM deleted_donation_examples WHERE demo_key=?)
+    ON CONFLICT(demo_key) DO NOTHING`).bind(title,description,condition,key,new Date().toISOString(),email,key,key)));
 }
 export async function getPublicDonations(actor: UserAccount): Promise<PublicDonation[]> {
   await prepare();
@@ -111,4 +112,16 @@ export async function actOnPublicDonation(actor: UserAccount, input: Record<stri
     db().prepare('UPDATE public_donations SET donation_id=last_insert_rowid() WHERE id=? AND selection_token=?').bind(id,token),
   ]);
   if(!result[0].meta.changes) throw new AccessError('No se pudo seleccionar: revisa la solicitud o actualiza el estado del artículo.',409);
+}
+
+export async function deletePublicDonation(actor:UserAccount,id:unknown) {
+  if(!Number.isSafeInteger(id))throw new AccessError('Artículo inválido.',400);
+  await prepare();
+  const result=await db().batch([
+    db().prepare('INSERT OR IGNORE INTO deleted_donation_examples(demo_key) SELECT demo_key FROM public_donations WHERE id=? AND donor_id=? AND demo_key IS NOT NULL').bind(id,actor.id),
+    db().prepare('DELETE FROM donation_images WHERE offer_id IN(SELECT id FROM public_donations WHERE id=? AND donor_id=?)').bind(id,actor.id),
+    db().prepare('DELETE FROM donation_requests WHERE offer_id IN(SELECT id FROM public_donations WHERE id=? AND donor_id=?)').bind(id,actor.id),
+    db().prepare('DELETE FROM public_donations WHERE id=? AND donor_id=?').bind(id,actor.id),
+  ]);
+  if(!result[3].meta.changes)throw new AccessError('La publicación no existe o no te pertenece.',404);
 }
