@@ -13,3 +13,15 @@ html.dark{color-scheme:dark;--background:#111a1b;--foreground:#e5eeeb;--card:#1a
 @media(max-width:640px){.resource-details{grid-template-columns:1fr}.resource-dialog{padding:20px}.resource-actions>*{flex:1}}
 
 .resource-full-image{width:100%;cursor:zoom-in}.resource-full-image.zoomed{cursor:zoom-out}.resource-full-image.zoomed img{max-height:none}
+
+/* Keep publication actions compact at desktop and mobile widths. */
+.my-listings .owned-listing { grid-template-columns: 70px minmax(0, 1fr) auto; }
+.owned-listing-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.owned-listing-actions [data-slot="select-trigger"] { width: auto; min-width: 140px; }
+.delete-publication[data-slot="button"] { width: auto; align-self: flex-start; flex: none; height: 32px; padding: 0 8px; gap: 6px; font-size: .875rem; color: var(--muted-foreground); background: transparent; box-shadow: none; }
+.delete-publication[data-slot="button"]:hover, .delete-publication[data-slot="button"]:focus-visible { color: #b42318; background: #fef3f2; }
+.dark .delete-publication[data-slot="button"]:hover, .dark .delete-publication[data-slot="button"]:focus-visible { color: #fda29b; background: #442321; }
+@media (max-width: 640px) {
+  .my-listings .owned-listing { grid-template-columns: 40px minmax(0, 1fr); }
+  .owned-listing-actions { grid-column: 1 / -1; justify-content: space-between; }
+}
